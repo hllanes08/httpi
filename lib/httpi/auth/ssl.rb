@@ -37,6 +37,9 @@ module HTTPI
       # ertificate store holds trusted CA certificates used to verify peer certificates.
       attr_accessor :cert_store
 
+      # Returns the available symmetric algorithms for encryption and decryption.
+      attr_reader :ciphers
+
       # Returns the cert type to validate SSL certificates PEM|DER.
       def cert_type
         @cert_type ||= :pem
@@ -50,6 +53,15 @@ module HTTPI
         end
 
         @cert_type = type
+      end
+
+      def ciphers=(ciphers)
+        @ciphers =
+	if ciphers
+	  context = OpenSSL::SSL::SSLContext.new
+	  context.ciphers = ciphers
+	  context.ciphers.map(&:first)
+        end
       end
 
       # Returns the SSL verify mode. Defaults to <tt>:peer</tt>.
